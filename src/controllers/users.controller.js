@@ -1,25 +1,24 @@
 import { db } from "../database/database.js";
 import {
-  loginSchema,
-  registerSchema,
-  transactionSchema,
+  createUserSchema,
+  validateUserSchema,
+  createTransactionSchema,
 } from "../database/schemas.js";
 
 async function findUserByEmail(email) {
   const user = await db.collection("users").findOne({ email });
-  console.log(user);
   return user;
 }
 
 async function createUser(req, res) {
-  let { name, email, password, confirmPassword } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
-  const validation = registerSchema.validate(
-    { name, email, password, confirmPassword },
+  const validation = createUserSchema.validate(
+    { name, email, password },
     { abortEarly: false }
   );
   if (validation.error) {
-    res.status(422).send(validation.error.details);
+    res.status(422).send(validation.error);
     return;
   }
 
@@ -37,4 +36,38 @@ async function createUser(req, res) {
   }
 }
 
-export { createUser, findUserByEmail };
+async function validateUser(req, res) {
+  const { email, password } = req.body;
+
+  const validation = validateUserSchema.validate(
+    { email, password },
+    { abortEarly: false }
+  );
+  if (validation.error) {
+    res.status(422).send(validation.error);
+    return;
+  }
+
+  try {
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res.status(409).send({ message: "Usuário inválidos." });
+      return;
+    }
+
+    if (password === user.password) {
+      res
+        .status(201)
+        .send({ message: "Usuário autenticado.", token: "abcdef" });
+      return;
+    } else {
+      res.status(409).send({ message: "Senha incorreta." });
+      return;
+    }
+  } catch (error) {
+    res.status(500).send(error.message);
+    return;
+  }
+}
+
+export { findUserByEmail, createUser, validateUser };

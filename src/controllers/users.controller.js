@@ -1,7 +1,7 @@
 import { db } from "../database/database.js";
 import {
-  signInSchema,
-  signUpSchema,
+  loginSchema,
+  registerSchema,
   transactionSchema,
 } from "../database/schemas.js";
 
@@ -12,10 +12,10 @@ async function findUserByEmail(email) {
 }
 
 async function createUser(req, res) {
-  let { name, email, password } = req.body;
+  let { name, email, password, confirmPassword } = req.body;
 
-  const validation = signUpSchema.validate(
-    { name, email, password },
+  const validation = registerSchema.validate(
+    { name, email, password, confirmPassword },
     { abortEarly: false }
   );
   if (validation.error) {

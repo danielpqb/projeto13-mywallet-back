@@ -13,6 +13,7 @@ async function getTransactions(req, res) {
   }
 
   res.status(200).send({ transactions: user.transactions });
+  return;
 }
 
 async function createTransaction(req, res) {
@@ -46,7 +47,11 @@ async function createTransaction(req, res) {
         { $set: { lastStatus: Date.now(), transactions: user.transactions } }
       );
     res.status(200).send({ message: "Transação criada com sucesso" });
-  } catch (error) {}
+    return;
+  } catch (error) {
+    res.status(500).send(error.message);
+    return;
+  }
 }
 
 export { getTransactions, createTransaction };

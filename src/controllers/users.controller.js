@@ -1,5 +1,7 @@
 import { db } from "../database/database.js";
 import { createUserSchema, validateUserSchema } from "../database/schemas.js";
+import { v4 as uuid } from "uuid";
+import bcrypt from "bcrypt";
 
 async function findUserByEmail(email) {
   const user = await db.collection("users").findOne({ email });
@@ -7,7 +9,7 @@ async function findUserByEmail(email) {
 }
 
 async function createUser(req, res) {
-  const { name, email, password, confirmPassword } = req.body;
+  const { name, email, password } = req.body;
 
   const validation = createUserSchema.validate(
     { name, email, password },
@@ -24,9 +26,15 @@ async function createUser(req, res) {
       res.status(409).send({ message: "Usuário já existe." });
       return;
     }
-    await db
-      .collection("users")
-      .insertOne({ name, email, password, token: "", transactions: [] });
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    await db.collection("users").insertOne({
+      name,
+      email,
+      password: passwordHash,
+      token: "",
+      transactions: [],
+    });
     res.status(201).send({ message: "Usuário criado com sucesso." });
   } catch (error) {
     res.status(500).send(error.message);
@@ -53,8 +61,8 @@ async function validateUser(req, res) {
       return;
     }
 
-    if (password === user.password) {
-      user.token = "abcdefghijklmnopqrstuvwxyz";
+    if (bcrypt.compareSync(password, user.password)) {
+      user.token = uuid();
 
       await db
         .collection("users")

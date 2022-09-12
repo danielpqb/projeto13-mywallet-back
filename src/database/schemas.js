@@ -14,7 +14,6 @@ const validateUserSchema = joi.object({
 const createTransactionSchema = joi.object({
   value: joi.number().required(),
   description: joi.string().required(),
-  type: joi.string().valid("receipt", "payment").required(),
 });
 
 export { createUserSchema, validateUserSchema, createTransactionSchema };

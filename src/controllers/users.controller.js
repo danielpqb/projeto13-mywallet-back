@@ -1,9 +1,5 @@
 import { db } from "../database/database.js";
-import {
-  createUserSchema,
-  validateUserSchema,
-  createTransactionSchema,
-} from "../database/schemas.js";
+import { createUserSchema, validateUserSchema } from "../database/schemas.js";
 
 async function findUserByEmail(email) {
   const user = await db.collection("users").findOne({ email });
@@ -64,7 +60,7 @@ async function validateUser(req, res) {
         .collection("users")
         .updateOne(
           { email: user.email },
-          { $set: { lastLogin: Date.now(), token: user.token } }
+          { $set: { lastStatus: Date.now(), token: user.token } }
         );
 
       res.status(200).send({

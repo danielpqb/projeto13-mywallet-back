@@ -28,7 +28,9 @@ async function createUser(req, res) {
       res.status(409).send({ message: "Usuário já existe." });
       return;
     }
-    await db.collection("users").insertOne({ name, email, password });
+    await db
+      .collection("users")
+      .insertOne({ name, email, password, token: "", transactions: [] });
     res.status(201).send({ message: "Usuário criado com sucesso." });
   } catch (error) {
     res.status(500).send(error.message);
@@ -51,14 +53,26 @@ async function validateUser(req, res) {
   try {
     const user = await findUserByEmail(email);
     if (!user) {
-      res.status(409).send({ message: "Usuário inválidos." });
+      res.status(409).send({ message: "Usuário inválido." });
       return;
     }
 
     if (password === user.password) {
-      res
-        .status(201)
-        .send({ message: "Usuário autenticado.", token: "abcdef" });
+      user.token = "abcdefghijklmnopqrstuvwxyz";
+
+      await db
+        .collection("users")
+        .updateOne(
+          { email: user.email },
+          { $set: { lastLogin: Date.now(), token: user.token } }
+        );
+
+      res.status(200).send({
+        token: user.token,
+        email: user.email,
+        name: user.name,
+        transactions: user.transactions,
+      });
       return;
     } else {
       res.status(409).send({ message: "Senha incorreta." });

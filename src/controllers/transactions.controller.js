@@ -1,5 +1,4 @@
 import { db } from "../database/database.js";
-import { createTransactionSchema } from "../database/schemas.js";
 
 async function getTransactions(req, res) {
   const auth = req.headers.authorization.replace("Bearer ", "");
@@ -24,17 +23,6 @@ async function createTransaction(req, res) {
 
   if (!user) {
     res.status(404).send({ message: "Token inválido" });
-    return;
-  }
-
-  const { value, description } = req.body;
-
-  const validation = createTransactionSchema.validate(
-    { value, description },
-    { abortEarly: false }
-  );
-  if (validation.error) {
-    res.status(422).send(validation.error);
     return;
   }
 

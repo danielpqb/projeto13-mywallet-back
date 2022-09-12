@@ -6,14 +6,18 @@ import {
   createTransaction,
 } from "../controllers/transactions.controller.js";
 
+import { createUserValidation } from "../middlewares/createUserValidation.middleware.js";
+import { loginUserValidation } from "../middlewares/loginUserValidation.middleware.js";
+import { createTransactionValidation } from "../middlewares/createTransactionValidation.middleware.js";
+
 const router = express.Router();
 
 //Users
-router.post("/register", createUser);
-router.post("/login", validateUser);
+router.post("/register", createUserValidation, createUser);
+router.post("/login", loginUserValidation, validateUser);
 
 //Transactions
 router.get("/transactions", getTransactions);
-router.post("/transactions", createTransaction);
+router.post("/transactions", createTransactionValidation, createTransaction);
 
 export { router };

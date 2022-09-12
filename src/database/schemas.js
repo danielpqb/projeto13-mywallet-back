@@ -6,7 +6,7 @@ const createUserSchema = joi.object({
   password: joi.string().required(),
 });
 
-const validateUserSchema = joi.object({
+const loginUserSchema = joi.object({
   email: joi.string().email().required(),
   password: joi.string().required(),
 });
@@ -16,4 +16,4 @@ const createTransactionSchema = joi.object({
   description: joi.string().required(),
 });
 
-export { createUserSchema, validateUserSchema, createTransactionSchema };
+export { createUserSchema, loginUserSchema, createTransactionSchema };

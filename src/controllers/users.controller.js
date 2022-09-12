@@ -1,5 +1,4 @@
 import { db } from "../database/database.js";
-import { createUserSchema, validateUserSchema } from "../database/schemas.js";
 import { v4 as uuid } from "uuid";
 import bcrypt from "bcrypt";
 
@@ -10,15 +9,6 @@ async function findUserByEmail(email) {
 
 async function createUser(req, res) {
   const { name, email, password } = req.body;
-
-  const validation = createUserSchema.validate(
-    { name, email, password },
-    { abortEarly: false }
-  );
-  if (validation.error) {
-    res.status(422).send(validation.error);
-    return;
-  }
 
   try {
     const user = await findUserByEmail(email);
@@ -44,15 +34,6 @@ async function createUser(req, res) {
 
 async function validateUser(req, res) {
   const { email, password } = req.body;
-
-  const validation = validateUserSchema.validate(
-    { email, password },
-    { abortEarly: false }
-  );
-  if (validation.error) {
-    res.status(422).send(validation.error);
-    return;
-  }
 
   try {
     const user = await findUserByEmail(email);
